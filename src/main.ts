@@ -1,34 +1,33 @@
-/**
- * Some predefined delay values (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
-}
+import http from 'http';
 
-/**
- * Returns a Promise<string> that resolves after a given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - A number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
+const server = http.createServer((req, res) => {
+  console.log(req.url);
+  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+  res.write(`
+<html>
+  <body>
+    <h1>Hello, Arno.</h1>
+  </body>
+</html>
+`);
+  res.write('<script>window._test = 1;</script>')
+  setTimeout(() => {
+    res.write('<script>window._test = 2;</script>');
+  }, 1000)
+  setTimeout(() => {
+    res.write('<script>window._test = 3;</script>');
+  }, 2000);
+  setTimeout(() => {
+    res.write('<script>window._test = 5;</script>');
+    res.end();
+  }, 5000);
+});
 
-// Please see the comment in the .eslintrc.json file about the suppressed rule!
-// Below is an example of how to use ESLint errors suppression. You can read more
-// at https://eslint.org/docs/latest/user-guide/configuring/rules#disabling-rules
+server.on('error', (err: any) => {
+  // wip
+  console.error(err);
+});
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export async function greeter(name: any) { // eslint-disable-line @typescript-eslint/no-explicit-any
-  // The name parameter should be of type string. Any is used only to trigger the rule.
-  return await delayedHello(name, Delays.Long);
-}
+server.listen(3001, () => {
+  console.log('Server listening on port 3001');
+});
